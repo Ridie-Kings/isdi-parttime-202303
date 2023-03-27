@@ -2,54 +2,80 @@ var registerPage = document.querySelector('.register')
 var loginPage = document.querySelector('.login')
 var homePage = document.querySelector('.home')
 var authenticatedEmail
+var profilePanel = homePage.querySelector('.profile')
 
-loginPage.querySelector('form').addEventListener('submit', function(event) {
+registerPage.querySelector('form').onsubmit = function (event) {
     event.preventDefault()
-    loginPage.classList.add('off')
-    homePage.classList.remove('off')
 
-    // TODO how to get all data from inputs
-    var email = loginPage.querySelector('input[name=email]').value
-    var password = loginPage.querySelector('input[name=password]').value
-    var result = authenticateUser(email, password)
+    var name = registerPage.querySelector('input[name=name]').value
+    var email = registerPage.querySelector('input[name=email]').value
+    var password = registerPage.querySelector('input[name=password]').value
+
+    var result = registerUser(name, email, password)
 
     if (!result) {
-        alert('wrong email or password')
-    } else {
-        authenticatedEmail = email
-        loginPage.classList.add('off')
-        homePage.classList.remove('off')
-    }
-})
-
-registerPage.querySelector('button').addEventListener('click', function (event) {
-    event.preventDefault()
-    
-    var registerName = registerPage.querySelector('input[name=name]').value
-    var registerEmail = registerPage.querySelector('input[name=email]').value
-    var registerPassword = registerPage.querySelector('input[name=password]').value
-    
-    var result = registerUser(registerName, registerEmail, registerPassword)
-    
-    if (!result) {
-        alert('Used mail')
+        alert('user already exists')
     } else {
         registerPage.classList.add('off')
         loginPage.classList.remove('off')
     }
-})
+}
 
-loginPage.querySelector('.form__link').addEventListener('click', function (event) {
+loginPage.querySelector('form').onsubmit = function (event) {
     event.preventDefault()
+
+    var email = loginPage.querySelector('input[name=email]').value
+    var password = loginPage.querySelector('input[name=password]').value
+
+    try {
+        authenticateUser(email, password)
+
+        authenticatedEmail = email
+
+        var foundUser = retrieveUser(email)
+
+        homePage.querySelector('p').innerText = `Hello, ${foundUser.name}!`
+
         loginPage.classList.add('off')
-        registerPage.classList.remove('off')
-})
+        homePage.classList.remove('off')
+    } catch (error) {
+        alert(error.message)
+    }
+}
 
-homePage.querySelector('a').addEventListener('click', function (event) {
+registerPage.querySelector('a').onclick = function (event) {
     event.preventDefault()
-})
 
+    registerPage.classList.add('off')
+    loginPage.classList.remove('off')
+}
 
-// TODO show 'hello, username on login
-// TODO add link to profile in home page and open a profile panel. Panales de una pagina.
+loginPage.querySelector('a').onclick = function (event) {
+    event.preventDefault()
+
+    loginPage.classList.add('off')
+    registerPage.classList.remove('off')
+}
+
+homePage.querySelector('a').onclick = function (event) {
+    event.preventDefault()
+
+    profilePanel.classList.remove('off')
+}
+
 // TODO add a form in profile panel to allow the user to update his/her password (asking current password, and new password and new password confirmation)
+
+profilePanel.querySelector('form').onsubmit = function (event) {
+    event.preventDefault()
+
+    var password = profilePanel.querySelector('input[name="password"]').value
+    var newPassword = profilePanel.querySelector('input[name="newPassword"]').value
+    var newPasswordConfirm = profilePanel.querySelector('input[name="newPasswordConfirm"]').value
+
+    var result = updateUserPassword(authenticatedEmail, password, newPassword, newPasswordConfirm)
+
+    if (!result)
+        alert('password update failed')
+    else
+        alert('password updated')
+}

@@ -1,54 +1,75 @@
-function registerUser(registerName, registerEmail, registerPassword) {
-    debugger
-    var foundUser
-    var registerConfirmedPassword = registerPage.querySelector('input[name=confirm-password]').value 
+function registerUser(name, email, password) {
+    if (typeof name !== 'string') throw new Error('name is not a string')
+    if (!name.length) throw new Error('name is empty')
+    if (typeof email !== 'string') throw new Error('email is not an string')
+    if (!email.length) throw new Error('email is empty')
+    if (typeof password !== 'string') throw new Error('password is not a string')
+    if (!password.length) throw new Error('password is empty')
+    // TODO add more input validation
 
-    for(var i = 0; i < users.length; i++) {
-        var user = users[i]
+    var foundUser = findUserByEmail(email)
 
-        if (user.email === registerEmail) {
-            foundUser = false
-            break
-        } else {
-            foundUser = true
-        }
-    }
+    if (foundUser)
+        throw new Error('user already exists')
 
-    if (!foundUser) 
-        return false
-    
-    if (registerName !== '' && registerEmail !== '' && registerPassword.length >= 6 && registerPassword === registerConfirmedPassword) {
-        users.push({
-            name: `${registerName}`,
-            email: `${registerEmail}`,
-            password: `${registerPassword}`
-        })
-        registerPage.classList.add('off')
-        loginPage.classList.remove('off')
-        return true
-    } else alert('Los datos introducidos no son correctos')   
+    users.push({
+        name: name,
+        email: email,
+        password: password
+    })
 }
 
-
 function authenticateUser(email, password) {
-    var foundUser
-    for(var i = 0; i < users.length; i++) {
-        var user = users[i]
+    if (typeof email !== 'string') throw new Error('email is not an string')
+    if (!email.length) throw new Error('email is empty')
+    if (typeof password !== 'string') throw new Error('password is not a string')
+    if (!password.length) throw new Error('password is empty')
+    // TODO add more input validation
 
-        if (user.email == email) {
-            foundUser = user
-            break
-        }
+    var foundUser = findUserByEmail(email)
+
+    if (!foundUser)
+        throw new Error('user not found')
+
+    if (foundUser.password !== password)
+        throw new Error('wrong password')
+}
+
+function retrieveUser(email) {
+    if (typeof email !== 'string') throw new Error('email is not an string')
+    if (!email.length) throw new Error('email is empty')
+
+    var foundUser = findUserByEmail(email)
+
+    if (!foundUser)
+        throw new Error('user not found')
+
+    var user = {
+        name: foundUser.name,
+        email: foundUser.email
     }
 
-    if (!foundUser || foundUser.password !== password)
-        return false
-        
-    return true
+    return user
 }
 
 function updateUserPassword(email, password, newPassword, newPasswordConfirm) {
+    // TODO add more input validation
 
+    var foundUser = findUserByEmail(email)
+
+    if (!foundUser)
+        return false
+
+    if (password !== foundUser.password)
+        return false
+
+    if (newPassword !== newPasswordConfirm)
+        return false
+
+    if (newPassword === password)
+        return false
+
+    foundUser.password = newPassword
+
+    return true
 }
-
-//TODO implement me
